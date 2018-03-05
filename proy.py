@@ -20,7 +20,8 @@ def addOptions():
     """
     parser = argparse.ArgumentParser()
     parser.add_argument('-A','--agent',dest='agent',default=None,help='Modifica agente de usuario') 
-    parser.add_argument('-P','--proxy',dest='proxy',default=None,action='store_true',help='Especifica el uso de proxy') 
+    parser.add_argument('-P','--proxy',dest='proxy',default=None,help='Especifica el uso de proxy') 
+    parser.add_argument('-H','--https',dest='https',default=None,action='store_true',help='Especifica el uso de https') 
     parser.add_argument('-p','--port', dest='port', default=None, help='Puerto de escucha del servidor')
     parser.add_argument('-s','--server', dest='server', default=None, help='Servidor')
     args = parser.parse_args()
@@ -148,12 +149,20 @@ if __name__ == '__main__':
     
     python proy.py -s <server DNS> [-p <puerto>] [-A <agente>] [-P <proxy ip>] 
 
+    Ejemplo:
+
+    python proy.py -s www.unam.mx -A "Creep 1.0"
+    python proy.py -s www.google.com -A "Creep 1.0" -H 
+
     """
     try:
         opts = addOptions()
         if not opts.server:
             printError('No se ha indicado servidor',True)
-        url = crea_url(opts.server,opts.port)
+        if opts.https:
+            url = crea_url(opts.server,opts.port,'https')
+        else:
+            url = crea_url(opts.server,opts.port)
         urls = crawl(url,crea_sesion(opts.proxy,opts.agent))
         for i in urls:
             print i 
@@ -163,3 +172,4 @@ if __name__ == '__main__':
     except Exception as e:
         printError('Ocurrio un error inesperado')
         printError(e, True)
+
